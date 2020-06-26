@@ -1,0 +1,68 @@
+int ledPinR = 9;
+int ledPinG = 10;
+int ledStateR = LOW;
+int ledStateG = LOW;
+const int trigPin=2;
+const int echoPin=3;
+float dist;
+char carState = 0;
+//0=away, 1=approaching, 2=stop
+#define CAR_AWAY 0
+#define CAR_CLOSE 1
+#define CAR_STOP 2
+
+
+void setup() {
+  pinMode(ledPinR, OUTPUT);
+  pinMode(ledPinG, OUTPUT);
+  pinMode (trigPin, OUTPUT);
+ pinMode (echoPin, INPUT);
+ carState= CAR_AWAY;
+
+  
+
+   Serial.begin(9600);
+
+  
+  Serial.println("starting!");
+  
+
+    }
+float readist (){
+  long duration;
+  digitalWrite (trigPin, LOW);
+  delayMicroseconds (2);
+  digitalWrite (trigPin, HIGH);
+  delayMicroseconds (5);
+  digitalWrite(trigPin, LOW);
+  duration=pulseIn (echoPin, HIGH);
+  return (((float(duration)/2)/1e6)*34606);
+}
+
+  
+void loop() {
+
+ dist = readist();
+  if (dist< 10 && CAR_STOP != carState)
+    {
+      digitalWrite(ledPinR, HIGH);
+      Serial.println("red");
+      carState = CAR_STOP;
+      digitalWrite(ledPinG, LOW);
+    }
+  else if (dist<50 && dist>=10 && CAR_CLOSE != carState)
+    {
+      digitalWrite(ledPinG,HIGH);
+      Serial.println("green");
+      carState = CAR_CLOSE;
+      digitalWrite(ledPinR, LOW);
+     }
+  else if (dist>=50 && CAR_AWAY != carState)
+    {
+    digitalWrite(ledPinR,LOW);
+    digitalWrite(ledPinG,LOW);
+    Serial.println("low");
+    carState = CAR_AWAY;
+    }
+    delay(200);
+  }
